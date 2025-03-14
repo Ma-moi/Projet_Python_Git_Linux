@@ -21,3 +21,8 @@ echo "$current_time;$price" >> prix_TSLA.csv
 echo "Heure actuelle : $current_time"
 echo "Prix actuel de l'action Tesla : $price"
 
+# On extrait ensuite le score ESG
+esg_score=$(curl -s "$URL" | grep -oP '(\d{1,2},\d{1,2} /100)' | head -n 1)
+
+# On extrait la variation de prix depuis la dernière clotûre
+variation=$(curl -s "$URL" | grep -oP '<span class="c-instrument c-instrument--variation"[^>]*>\K[^<]+' | head -n 1)
