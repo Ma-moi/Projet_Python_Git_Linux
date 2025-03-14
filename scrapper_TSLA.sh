@@ -20,6 +20,8 @@ prix_bid=$(curl -s "$URL" | grep -oP '<td class="c-table__cell c-table__cell--do
 quantite_ask=$(curl -s "$URL" | grep -oP '<td class="c-table__cell c-table__cell--dotted"[^>]*>\K[\d\s]+' | head -n 3 | tail -n 1)
 prix_ask=$(curl -s "$URL" | grep -oP '<td class="c-table__cell c-table__cell--dotted"[^>]*>\K[\d,]+' | head -n 4 | tail -n 1)
 
+# On extrait le prix de clôture précédent
+previous_close=$(curl -s "$URL" | grep -oP '<span class="c-instrument c-instrument--previousclose"[^>]*>\K[\d,]+')
 
 # On détermine l'heure à laquelle notre machine a récupéré ces informations
 current_time=$(date "+%Y-%m-%d %H:%M:%S")
@@ -44,3 +46,4 @@ echo "Quantité bid : $quantite_bid"
 echo "Prix bid : $prix_bid"
 echo "Quantité ask : $quantite_ask"
 echo "Prix ask : $prix_ask"
+echo "Clôture précédente : $previous_close"
