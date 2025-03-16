@@ -26,6 +26,9 @@ previous_close=$(curl -s "$URL" | grep -oP '<span class="c-instrument c-instrume
 # On extrait le prix le plus haut de la journée
 high_price=$(curl -s "$URL" | grep -oP '<span class="c-instrument c-instrument--high"[^>]*>\K[\d,]+')
 
+# On extrait le prix le plus bas de la journée
+low_price=$(curl -s "$URL" | grep -oP '<span class="c-instrument c-instrument--low"[^>]*>\K[\d,]+')
+
 # On détermine l'heure à laquelle notre machine a récupéré ces informations
 current_time=$(date "+%Y-%m-%d %H:%M:%S")
 
@@ -51,3 +54,4 @@ echo "Quantité ask : $quantite_ask"
 echo "Prix ask : $prix_ask"
 echo "Clôture précédente : $previous_close"
 echo "Prix le plus haut de la journée : $high_price"
+echo "Prix le plus bas de la journée : $low_price"
