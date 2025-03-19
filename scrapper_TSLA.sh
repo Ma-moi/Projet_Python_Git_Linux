@@ -15,10 +15,12 @@ esg_score=$(curl -s "$URL" | grep -oP '(\d{1,2},\d{1,2} /100)' | head -n 1)
 variation=$(curl -s "$URL" | grep -oP '<span class="c-instrument c-instrument--variation"[^>]*>\K[^<]+' | head -n 1)
 
 # On extrait du site les valeurs des quantités et des prix du bid et du ask
-quantite_bid=$(curl -s "$URL" | grep -oP '<td class="c-table__cell c-table__cell--dotted"[^>]*>\K[\d\s]+' | head -n 1)
-prix_bid=$(curl -s "$URL" | grep -oP '<td class="c-table__cell c-table__cell--dotted"[^>]*>\K[\d,]+' | head -n 2 | tail -n 1)
-quantite_ask=$(curl -s "$URL" | grep -oP '<td class="c-table__cell c-table__cell--dotted"[^>]*>\K[\d\s]+' | head -n 3 | tail -n 1)
-prix_ask=$(curl -s "$URL" | grep -oP '<td class="c-table__cell c-table__cell--dotted"[^>]*>\K[\d,]+' | head -n 4 | tail -n 1)
+values=$(curl -s "$URL" | grep -oP '<td class="c-table__cell c-table__cell--dotted"[^>]*>\K[\d\s,]+')
+
+quantite_bid=$(echo "$values" | sed -n '1p') 
+prix_bid=$(echo "$values" | sed -n '2p')    
+quantite_ask=$(echo "$values" | sed -n '3p')  
+prix_ask=$(echo "$values" | sed -n '4p') 
 
 # On extrait le prix de clôture précédent
 previous_close=$(curl -s "$URL" | grep -oP '<span class="c-instrument c-instrument--previousclose"[^>]*>\K[\d,]+')
