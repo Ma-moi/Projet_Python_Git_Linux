@@ -37,11 +37,11 @@ current_time=$(date "+%Y-%m-%d %H:%M:%S")
 
 # Si le fichier n'existe pas alors on le crée
 if [ ! -f prix_TSLA.csv ]; then
-    echo "Date;Prix;ESG Score;Variation;Quantite_Bid;Prix_Bid;Quantite_Ask;Prix_Ask" > prix_TSLA.csv  # Ajouter l'en-tête si le fichier n'existe pas encore
+    echo "Date;Prix;ESG Score;Variation;Quantite_Bid;Prix_Bid;Quantite_Ask;Prix_Ask;Cloture_Precedente;Plus_Haut;Plus_Bas" > prix_TSLA.csv  # Ajouter l'en-tête si le fichier n'existe pas encore
 fi
 
 # Ajouter les nouvelles données sans recréer le fichier
-echo "$current_time;$price;$esg_score;$variation;$quantite_bid;$prix_bid;$quantite_ask;$prix_ask" >> prix_TSLA.csv
+echo "$current_time;$price;$esg_score;$variation;$quantite_bid;$prix_bid;$quantite_ask;$prix_ask;$previous_close;$high_price;$low_price" >> prix_TSLA.csv
 
 # Afficher l'heure actuelle et le prix
 echo "Heure actuelle : $current_time"
