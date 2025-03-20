@@ -44,16 +44,4 @@ fi
 
 # Ajouter les nouvelles données sans recréer le fichier
 echo "$current_time;$price;$esg_score;$variation;$quantite_bid;$prix_bid;$quantite_ask;$prix_ask;$previous_close;$high_price;$low_price" >> prix_TSLA.csv
-
-# Afficher l'heure actuelle et le prix
-echo "Heure actuelle : $current_time"
-echo "Prix actuel de l'action Tesla : $price"
-echo "Risque ESG : $esg_score"
-echo "Variation du prix : $variation"
-echo "Quantité bid : $quantite_bid"
-echo "Prix bid : $prix_bid"
-echo "Quantité ask : $quantite_ask"
-echo "Prix ask : $prix_ask"
-echo "Clôture précédente : $previous_close"
-echo "Prix le plus haut de la journée : $high_price"
-echo "Prix le plus bas de la journée : $low_price"
+echo "$current_time;$price;$esg_score;$variation;$quantite_bid;$prix_bid;$quantite_ask;$prix_ask;$previous_close;$high_price;$low_price"
