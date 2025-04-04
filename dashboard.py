@@ -38,6 +38,7 @@ server = app.server  # Allows Gunicorn to find Flask app
 # STEP 3: Load and Clean Data
 # ===========================
 
+# We write a function to load the data and return the cleaned dataframe
 def load_data():
     df = pd.read_csv("prix_TSLA.csv", sep=";", parse_dates=["Date"], dayfirst=False)
     df['Date'] = pd.to_datetime(df['Date'], format='%Y-%m-%d %H:%M:%S')
@@ -58,17 +59,20 @@ def load_data():
 # STEP 4: Graphs and Metrics
 # ==========================
 
+# We draw a line graph of Tesla price evolution over time
 def graph_price(df):
     return go.Figure([
         go.Scatter(x=df['Date'], y=df['Price'], mode='lines', name='Price', line=dict(color='royalblue'))
     ]).update_layout(title="Price Evolution (TSLA)", template="plotly_dark")
 
+# We plot a graph of Tesla price change during the last 3 hours
 def graph_recent_variation(df):
     last_hours = df[df['Date'] >= df['Date'].max() - timedelta(hours=3)]
     return go.Figure([
         go.Scatter(x=last_hours['Date'], y=last_hours['Change'], mode='lines+markers', name='Recent Change', line=dict(color='orange'))
     ]).update_layout(title="Change Over the Last 3 Hours (%)", template="plotly_dark")
 
+# We display the latest ESG score
 def display_esg_score(df):
     current_esg = df['ESG Score'].dropna().iloc[-1] if not df['ESG Score'].dropna().empty else None
     score_display = f"{current_esg:.1f} / 100" if current_esg is not None and not pd.isna(current_esg) else "Data unavailable"
@@ -79,6 +83,7 @@ def display_esg_score(df):
         html.P("(Last available value in the dataset)", className="text-white text-center", style={"fontFamily": "Segoe UI"})
     ], style={"backgroundColor": "#1e1e1e", "padding": "2rem", "borderRadius": "10px", "height": "100%"})
 
+# We compute and print today's total volume (bid+ask) of transactions
 def display_volume(df):
     today = df['Date'].dt.date == df['Date'].max().date()
     volume = df.loc[today, 'Bid_Quantity'].sum() + df.loc[today, 'Ask_Quantity'].sum()
@@ -89,6 +94,7 @@ def display_volume(df):
         html.P("Reflects investor interest and liquidity for Tesla.", className="text-white text-center", style={"fontFamily": "Segoe UI"})
     ], style={"backgroundColor": "#1e1e1e", "padding": "2rem", "borderRadius": "10px", "height": "100%"})
 
+# We represent on a pie chart comparing bid and ask quantities
 def graph_bid_ask_pie(df):
     bid = df['Bid_Quantity'].sum()
     ask = df['Ask_Quantity'].sum()
@@ -96,6 +102,7 @@ def graph_bid_ask_pie(df):
         go.Pie(labels=["Bid Quantity", "Ask Quantity"], values=[bid, ask], marker=dict(colors=['green', 'red']), hole=0.4)
     ]).update_layout(title="Bid/Ask Quantity Distribution", template="plotly_dark")
 
+# We draw a line graph showing smoothed trading volume using a rolling average
 def graph_volume_smooth(df):
     df['Volume'] = df['Bid_Quantity'] + df['Ask_Quantity']
     df['Volume_MA'] = df['Volume'].rolling(window=3).mean()
@@ -103,12 +110,14 @@ def graph_volume_smooth(df):
         go.Scatter(x=df['Date'], y=df['Volume_MA'], mode='lines', name='Average Volume', line=dict(color='violet'))
     ]).update_layout(title="Smoothed Volume (Bid + Ask)", template="plotly_dark")
 
+# We draw an histogram showing the histogram showing distribution of bid-ask spreads
 def graph_spread_histogram(df):
     spread = df['Ask_Price'] - df['Bid_Price']
     return go.Figure([
         go.Histogram(x=spread, nbinsx=30, marker_color='#1f77b4')
     ]).update_layout(title="Bid-Ask Spread Distribution", template="plotly_dark")
 
+# We draw an area chart showing daily high and low price ranges, to observe daily volatility
 def graph_high_low_area(df):
     return go.Figure([
         go.Scatter(x=df['Date'], y=df['High'], name='High', mode='lines', line=dict(color='darkorange')),
@@ -118,6 +127,8 @@ def graph_high_low_area(df):
 # =======================
 # Table with Last 5 Rows
 # =======================
+
+# At the bottom of the page, we display a data table with the last 5 rows from the dataset
 
 def last_five_rows_table(df):
     last_five = df.tail(5)
@@ -132,6 +143,9 @@ def last_five_rows_table(df):
 # =========================
 # STEP 5: Daily HTML Report
 # =========================
+
+# We generate a downloadable HTML report with summary metrics for the current day
+# The report will be available each evening at 8pm
 
 def generate_html_report(df):
     today = df[df['Date'].dt.date == df['Date'].max().date()]
@@ -229,7 +243,10 @@ def generate_html_report(df):
 # STEP 6: Layout
 # ==============
 
+# We define in the layout the visual structure of the web dashboard using Bootstrap
 app.layout = dbc.Container([
+    
+    # As an header, we put the tesla logo and the title
     dbc.Row([
         dbc.Col(
             html.Img(
@@ -248,6 +265,7 @@ app.layout = dbc.Container([
         )
     ]),
 
+    # We write an intro with explanations
     dbc.Card(
         dbc.CardBody([
             html.H5(
@@ -280,11 +298,13 @@ app.layout = dbc.Container([
 
     html.Hr(),
 
+    # We first show the ESG score and volume
     dbc.Row([
         dbc.Col([display_esg_score(load_data())], md=6),
         dbc.Col([display_volume(load_data())], md=6)
     ]),
 
+    # We then show price evolution and recent variation
     dbc.Row([
         dbc.Col([
             dcc.Graph(figure=graph_price(load_data())),
@@ -296,6 +316,7 @@ app.layout = dbc.Container([
         ], md=6)
     ]),
 
+    # We then show bid ask pie and smoothed volume
     dbc.Row([
         dbc.Col([
             dcc.Graph(figure=graph_bid_ask_pie(load_data())),
@@ -307,6 +328,7 @@ app.layout = dbc.Container([
         ], md=6)
     ]),
 
+    # We then show the spread histogram and high/low range
     dbc.Row([
         dbc.Col([
             dcc.Graph(figure=graph_spread_histogram(load_data())),
@@ -318,6 +340,7 @@ app.layout = dbc.Container([
         ], md=6)
     ]),
 
+    # At the bottom, we display the table with the last five rows
     dbc.Row([
         dbc.Col([
             html.H4(
@@ -331,6 +354,7 @@ app.layout = dbc.Container([
 
     html.Hr(),
 
+    # The download button available at 8pm
     dbc.Row([
         dbc.Col([
             html.H4("Download Daily HTML Report", className="text-white mt-4 mb-3"),
@@ -353,6 +377,7 @@ app.layout = dbc.Container([
 
     html.Hr(),
 
+    # At the end of the page, we put our git
     dbc.Row([
         dbc.Col([
             html.P(
@@ -375,6 +400,7 @@ app.layout = dbc.Container([
 # STEP 7: Callback to Download HTML
 # =================================
 
+# When the user clicks the download button, this callback generates the HTML report + download
 @app.callback(
     Output("download-html-report", "data"),
     Input("btn-download", "n_clicks"),
